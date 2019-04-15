@@ -50,10 +50,10 @@ index 9bf51673..0db09df6 100644
 +
 +        auto impl = IMPL(terminal);
 +    if (column) {
-+                *column = impl->m_selection_start.col;
++                *column = impl->m_selection_resolved.start_column();
 +    }
 +    if (row) {
-+                *row = impl->m_selection_start.row;
++                *row = impl->m_selection_resolved.start_row();
 +    }
 +}
 +

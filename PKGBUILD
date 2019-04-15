@@ -2,7 +2,7 @@
 # Contributor: Ionut Biru <ibiru@archlinux.org>
 
 pkgname=vte3-ng-with-nN-cursor-move-patch
-pkgver=0.54.2
+pkgver=0.56.1
 pkgrel=1
 pkgdesc="Virtual Terminal Emulator widget for use with GTK3"
 url="https://wiki.gnome.org/Apps/Terminal/VTE"
@@ -13,7 +13,7 @@ depends=(gtk3 pcre2 gnutls vte-common)
 makedepends=(intltool gobject-introspection vala glade git gtk-doc gperf)
 conflicts=(vte3)
 provides=(vte3)
-_commit=6c37e5164aef8b2ac3dea02f6c1a3152dad93fda  # tags/0.54.2
+_commit=52e546badeedf12dbbd7706042f1d0f3a9e4f0b3  # tags/0.56.1
 source=("git+https://gitlab.gnome.org/GNOME/vte.git/#commit=$_commit"
         "0001-expose-functions-for-pausing-unpausing-output.patch"
         "0002-expose-function-for-setting-cursor-position.patch"
@@ -27,7 +27,7 @@ sha256sums=('SKIP'
             '3f2486b08e4452421d8de58826b1cf99925514af2b95abaf1b34d081bc3eb1d8'
             'e74d000a729eabf31f4aabd08433790a7700fcccb6f302916992fb750f3d28ea'
             'a6d90ac8d391d6906dbed22041c597176366501ff625a1b222f1fcf9f83e78f4'
-            'fe60f2db4c2afb21da509a109cbdee7a83d7c2cf63839fb8a39f5263bd65dece')
+            'e02da4f83aab8b4fcdab5adb2099de246c4d8c3864381e5847e11117c5848246')
 
 pkgver() {
   cd vte
@@ -36,9 +36,6 @@ pkgver() {
 
 prepare() {
   cd vte
-
-  # https://bugzilla.gnome.org/show_bug.cgi?id=778926
-  git cherry-pick -n 809e79770b4dea34d64574710ce429a86855fdb2
 
   patch -p1 -i ${srcdir}/0001-expose-functions-for-pausing-unpausing-output.patch
   patch -p1 -i ${srcdir}/0002-expose-function-for-setting-cursor-position.patch
@@ -61,8 +58,9 @@ build() {
   make
 }
 
-package(){
+package() {
   cd vte
+
   make DESTDIR="$pkgdir" install
 
   rm "$pkgdir"/etc/profile.d/vte.sh
