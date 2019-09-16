@@ -2,18 +2,18 @@
 # Contributor: Ionut Biru <ibiru@archlinux.org>
 
 pkgname=vte3-ng-with-nN-cursor-move-patch
-pkgver=0.56.3
+pkgver=0.58.0
 pkgrel=1
 pkgdesc="Virtual Terminal Emulator widget for use with GTK3"
 url="https://wiki.gnome.org/Apps/Terminal/VTE"
 arch=(x86_64)
 license=(LGPL)
 options=(!emptydirs)
-depends=(gtk3 pcre2 gnutls vte-common)
-makedepends=(intltool gobject-introspection vala glade git gtk-doc gperf)
+depends=(gtk3 pcre2 gnutls fribidi vte-common)
+makedepends=(gobject-introspection vala git gtk-doc gperf meson)
 conflicts=(vte3)
 provides=(vte3)
-_commit=14fac9f56d923cbb23b0c114ddf630fe36c5163c  # tags/0.56.3
+_commit=0a0abd8ff68b521fabd7dfeca3ce00a382722fcf  # tags/0.58.0
 source=("git+https://gitlab.gnome.org/GNOME/vte.git/#commit=$_commit"
         "0001-expose-functions-for-pausing-unpausing-output.patch"
         "0002-expose-function-for-setting-cursor-position.patch"
@@ -43,25 +43,15 @@ prepare() {
   patch -p1 -i ${srcdir}/0004-add-functions-to-getset-block-selection-mode.patch
   patch -p1 -i ${srcdir}/0005-expose-function-for-getting-the-selected-text.patch
   patch -p1 -i ${srcdir}/0006-Add-function-to-get-selection-position.patch
-
-  NOCONFIGURE=1 ./autogen.sh
 }
 
 build() {
-  cd vte
-
-  ./configure --prefix=/usr --sysconfdir=/etc --libexecdir=/usr/lib/vte \
-    --localstatedir=/var --disable-static --enable-introspection --enable-glade-catalogue --enable-gtk-doc
-
-  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
-
-  make
+  arch-meson vte build -D docs=true
+  ninja -C build
 }
 
 package() {
-  cd vte
-
-  make DESTDIR="$pkgdir" install
+  DESTDIR="$pkgdir" meson install -C build
 
   rm "$pkgdir"/etc/profile.d/vte.sh
 }
