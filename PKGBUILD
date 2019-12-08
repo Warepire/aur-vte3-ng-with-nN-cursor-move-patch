@@ -2,7 +2,7 @@
 # Contributor: Ionut Biru <ibiru@archlinux.org>
 
 pkgname=vte3-ng-with-nN-cursor-move-patch
-pkgver=0.58.0
+pkgver=0.58.3
 pkgrel=1
 pkgdesc="Virtual Terminal Emulator widget for use with GTK3"
 url="https://wiki.gnome.org/Apps/Terminal/VTE"
@@ -13,7 +13,7 @@ depends=(gtk3 pcre2 gnutls fribidi vte-common)
 makedepends=(gobject-introspection vala git gtk-doc gperf meson)
 conflicts=(vte3)
 provides=(vte3)
-_commit=0a0abd8ff68b521fabd7dfeca3ce00a382722fcf  # tags/0.58.0
+_commit=73f9e209f70050ea88ed3d80e819ea1a04c5a6e1  # tags/0.58.3
 source=("git+https://gitlab.gnome.org/GNOME/vte.git/#commit=$_commit"
         "0001-expose-functions-for-pausing-unpausing-output.patch"
         "0002-expose-function-for-setting-cursor-position.patch"
