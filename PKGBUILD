@@ -2,18 +2,17 @@
 # Contributor: Ionut Biru <ibiru@archlinux.org>
 
 pkgname=vte3-ng-with-nN-cursor-move-patch
-pkgver=0.58.3
+pkgver=0.60.0
 pkgrel=1
-pkgdesc="Virtual Terminal Emulator widget for use with GTK3"
+pkgdesc="Virtual Terminal Emulator widget"
 url="https://wiki.gnome.org/Apps/Terminal/VTE"
 arch=(x86_64)
 license=(LGPL)
-options=(!emptydirs)
-depends=(gtk3 pcre2 gnutls fribidi vte-common)
+depends=(gtk3 pcre2 gnutls fribidi systemd-libs vte-common)
 makedepends=(gobject-introspection vala git gtk-doc gperf meson)
 conflicts=(vte3)
 provides=(vte3)
-_commit=73f9e209f70050ea88ed3d80e819ea1a04c5a6e1  # tags/0.58.3
+_commit=bf56194f78fc13a99023358efb6f7af0f228240c  # tags/0.60.0
 source=("git+https://gitlab.gnome.org/GNOME/vte.git/#commit=$_commit"
         "0001-expose-functions-for-pausing-unpausing-output.patch"
         "0002-expose-function-for-setting-cursor-position.patch"
@@ -46,12 +45,13 @@ prepare() {
 }
 
 build() {
-  arch-meson vte build -D docs=true
+  arch-meson vte build -D docs=true -D b_lto=false
   ninja -C build
 }
 
 package() {
   DESTDIR="$pkgdir" meson install -C build
 
-  rm "$pkgdir"/etc/profile.d/vte.sh
+  rm -r "$pkgdir"/etc/profile.d
+  rm -r "$pkgdir"/usr/lib/{systemd,vte-urlencode-cwd}
 }
