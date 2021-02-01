@@ -1,39 +1,39 @@
-From 27ff0d7d1bd25bfbcd6c561c6223383c7ebfd5fe Mon Sep 17 00:00:00 2001
+From 221b27b7b479c47084679f90ec37c6389711bdab Mon Sep 17 00:00:00 2001
 From: Jelle van der Waa <jelle@vdwaa.nl>
 Date: Sat, 13 Feb 2016 22:38:21 +0100
-Subject: [PATCH] add functions to get/set block selection mode
+Subject: [PATCH 4/6] add functions to get/set block selection mode
 
 Upstream-Status: Rejected
 Patch-URI: https://github.com/thestinger/vte-ng/commit/27ff0d7d1bd25bfbcd6c561c6223383c7ebfd5fe
 ---
  src/vte/vteterminal.h |  5 +++++
- src/vtegtk.cc         | 25 +++++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+ src/vtegtk.cc         | 40 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
 diff --git a/src/vte/vteterminal.h b/src/vte/vteterminal.h
-index 7931ef01..ac7b2c2b 100644
+index 3adb8f7e..9c19764d 100644
 --- a/src/vte/vteterminal.h
 +++ b/src/vte/vteterminal.h
-@@ -197,6 +197,11 @@ void vte_terminal_select_all(VteTerminal *terminal) _VTE_GNUC_NONNULL(1);
+@@ -212,6 +212,11 @@ void vte_terminal_select_all(VteTerminal *terminal) _VTE_CXX_NOEXCEPT _VTE_GNUC_
  _VTE_PUBLIC
- void vte_terminal_unselect_all(VteTerminal *terminal) _VTE_GNUC_NONNULL(1);
+ void vte_terminal_unselect_all(VteTerminal *terminal) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
  _VTE_PUBLIC
-+gboolean vte_terminal_get_selection_block_mode(VteTerminal *terminal) _VTE_GNUC_NONNULL(1);
++gboolean vte_terminal_get_selection_block_mode(VteTerminal *terminal) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
 +_VTE_PUBLIC
 +void vte_terminal_set_selection_block_mode(VteTerminal *terminal,
-+                                            gboolean block_mode) _VTE_GNUC_NONNULL(1);
++                                            gboolean block_mode) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
 +_VTE_PUBLIC
  void vte_terminal_select_text(VteTerminal *terminal, long start_col, long start_row,
- 			      long end_col, long end_row) _VTE_GNUC_NONNULL(1);
+ 			      long end_col, long end_row) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
  
 diff --git a/src/vtegtk.cc b/src/vtegtk.cc
-index 0a24096a..5ca058c7 100644
+index deff7444..55efd503 100644
 --- a/src/vtegtk.cc
 +++ b/src/vtegtk.cc
-@@ -2339,6 +2339,31 @@ vte_terminal_unselect_all(VteTerminal *terminal)
- 
-         IMPL(terminal)->deselect_all();
+@@ -3044,6 +3044,46 @@ catch (...)
+         vte::log_exception();
  }
+ 
 +/**
 + * vte_terminal_get_selection_block_mode:
 + * @terminal: a #VteTerminal
@@ -43,9 +43,17 @@ index 0a24096a..5ca058c7 100644
 + * Returns: %TRUE if block selection is enabled, %FALSE if not
 + */
 +
-+gboolean vte_terminal_get_selection_block_mode(VteTerminal *terminal) {
++gboolean vte_terminal_get_selection_block_mode(VteTerminal *terminal) noexcept
++try
++{
 +        g_return_val_if_fail(VTE_IS_TERMINAL(terminal), FALSE);
 +	return IMPL(terminal)->m_selection_block_mode;
++}
++catch (...)
++{
++	vte::log_exception();
++
++	return FALSE;
 +}
 +/**
 + * vte_terminal_set_selection_block_mode:
@@ -55,10 +63,20 @@ index 0a24096a..5ca058c7 100644
 + * Sets whether or not block selection is enabled.
 + */
 +void
-+vte_terminal_set_selection_block_mode(VteTerminal *terminal, gboolean block_mode) {
++vte_terminal_set_selection_block_mode(VteTerminal *terminal, gboolean block_mode) noexcept
++try
++{
 +	g_return_if_fail (VTE_IS_TERMINAL (terminal));
 +	IMPL(terminal)->m_selection_block_mode = block_mode;
 +}
- 
++catch (...)
++{
++	vte::log_exception();
++}
++
  /**
   * vte_terminal_select_text:
+  * @terminal: a #VteTerminal
+-- 
+2.25.2
+

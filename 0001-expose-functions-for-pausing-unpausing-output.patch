@@ -1,38 +1,38 @@
-From 988b48e3d5dc37b9cc02d48a5090acf897ed929c Mon Sep 17 00:00:00 2001
+From 4f28a3c22303e05ef591e252035c9825eac793d2 Mon Sep 17 00:00:00 2001
 From: Jelle van der Waa <jelle@vdwaa.nl>
 Date: Sat, 13 Feb 2016 22:01:59 +0100
-Subject: [PATCH] expose functions for pausing unpausing output
+Subject: [PATCH 1/6] expose functions for pausing unpausing output
 
 Upstream-Status: Rejected
 Patch-URI: https://github.com/thestinger/vte-ng/commit/988b48e3d5dc37b9cc02d48a5090acf897ed929c
 ---
  src/vte/vteterminal.h |  6 ++++++
- src/vtegtk.cc         | 26 ++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
+ src/vtegtk.cc         | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
 diff --git a/src/vte/vteterminal.h b/src/vte/vteterminal.h
-index 4e2896cf..5c90f187 100644
+index d5e96535..d36f566e 100644
 --- a/src/vte/vteterminal.h
 +++ b/src/vte/vteterminal.h
-@@ -175,6 +175,12 @@ void vte_terminal_feed_child_binary(VteTerminal *terminal,
-                                     const guint8 *data,
-                                     gsize length) _VTE_GNUC_NONNULL(1);
+@@ -190,6 +190,12 @@ void vte_terminal_feed_child(VteTerminal *terminal,
+                              const char *text,
+                              gssize length) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
  
 +_VTE_PUBLIC
-+void vte_terminal_connect_pty_read(VteTerminal *terminal);
++void vte_terminal_connect_pty_read(VteTerminal *terminal) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
 +
 +_VTE_PUBLIC
-+void vte_terminal_disconnect_pty_read(VteTerminal *terminal);
++void vte_terminal_disconnect_pty_read(VteTerminal *terminal) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
 +
  /* Copy currently-selected text to the clipboard, or from the clipboard to
   * the terminal. */
  _VTE_PUBLIC
 diff --git a/src/vtegtk.cc b/src/vtegtk.cc
-index 9adeccf3..b191339b 100644
+index 41de14ba..9d387b0b 100644
 --- a/src/vtegtk.cc
 +++ b/src/vtegtk.cc
-@@ -2730,6 +2730,32 @@ vte_terminal_feed_child(VteTerminal *terminal,
-         IMPL(terminal)->feed_child(text, length);
+@@ -3573,6 +3573,42 @@ catch (...)
+         vte::log_exception();
  }
  
 +/**
@@ -42,10 +42,15 @@ index 9adeccf3..b191339b 100644
 + * Unpause output
 + */
 +void
-+vte_terminal_connect_pty_read(VteTerminal *terminal)
++vte_terminal_connect_pty_read(VteTerminal *terminal) noexcept
++try
 +{
 +	g_return_if_fail(VTE_IS_TERMINAL(terminal));
 +	IMPL(terminal)->connect_pty_read();
++}
++catch (...)
++{
++	vte::log_exception();
 +}
 +
 +/**
@@ -55,12 +60,20 @@ index 9adeccf3..b191339b 100644
 + * Pause output
 + */
 +void
-+vte_terminal_disconnect_pty_read(VteTerminal *terminal)
++vte_terminal_disconnect_pty_read(VteTerminal *terminal) noexcept
++try
 +{
 +	g_return_if_fail(VTE_IS_TERMINAL(terminal));
 +	IMPL(terminal)->disconnect_pty_read();
++}
++catch (...)
++{
++	vte::log_exception();
 +}
 +
  /**
   * vte_terminal_feed_child_binary:
   * @terminal: a #VteTerminal
+-- 
+2.25.2
+

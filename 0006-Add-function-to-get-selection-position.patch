@@ -1,36 +1,36 @@
-From c92084c13fbfe343cf8c97222f78681609e7a694 Mon Sep 17 00:00:00 2001
+From 851acc97703ab6d7a885a7c7d651b6540f474d33 Mon Sep 17 00:00:00 2001
 From: Kenneth Lyons <ixjlyons@gmail.com>
 Date: Sat, 9 Apr 2016 12:11:09 -0700
-Subject: [PATCH] Add function to get selection position.
+Subject: [PATCH 6/6] Add function to get selection position.
 
 Upstream-Status: Inappropriate [Not my patch to submit]
 Patch-URI: https://github.com/thestinger/termite/issues/287#issuecomment-207836220
 ---
  src/vte/vteterminal.h |  4 ++++
- src/vtegtk.cc         | 24 ++++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ src/vtegtk.cc         | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
 diff --git a/src/vte/vteterminal.h b/src/vte/vteterminal.h
-index 95ffac6d..87594411 100644
+index d0d8e53d..8634342f 100644
 --- a/src/vte/vteterminal.h
 +++ b/src/vte/vteterminal.h
-@@ -347,6 +347,10 @@ char *vte_terminal_get_text_range(VteTerminal *terminal,
+@@ -405,6 +405,10 @@ char *vte_terminal_get_text_range(VteTerminal *terminal,
  				  gpointer user_data,
- 				  GArray *attributes) _VTE_GNUC_NONNULL(1) G_GNUC_MALLOC;
+ 				  GArray *attributes) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1) G_GNUC_MALLOC;
  _VTE_PUBLIC
 +void vte_terminal_get_selection_position(VteTerminal *terminal,
 +                      glong *column,
-+                                     glong *row) _VTE_GNUC_NONNULL(1);
++                                     glong *row) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
 +_VTE_PUBLIC
  void vte_terminal_get_cursor_position(VteTerminal *terminal,
  				      glong *column,
-                                       glong *row) _VTE_GNUC_NONNULL(1);
+                                       glong *row) _VTE_CXX_NOEXCEPT _VTE_GNUC_NONNULL(1);
 diff --git a/src/vtegtk.cc b/src/vtegtk.cc
-index 9bf51673..0db09df6 100644
+index 5ed3c60a..76acb40a 100644
 --- a/src/vtegtk.cc
 +++ b/src/vtegtk.cc
-@@ -2197,6 +2197,30 @@ vte_terminal_get_selection(VteTerminal *terminal)
- 	return g_strdup (IMPL(terminal)->m_selection[VTE_SELECTION_PRIMARY]->str);
+@@ -3123,6 +3123,35 @@ catch (...)
+ 	return NULL;
  }
  
 +/**
@@ -44,7 +44,8 @@ index 9bf51673..0db09df6 100644
 +void
 +vte_terminal_get_selection_position(VteTerminal *terminal,
 +                long *column,
-+                                    long *row)
++                                    long *row) noexcept
++try
 +{
 +    g_return_if_fail(VTE_IS_TERMINAL(terminal));
 +
@@ -56,7 +57,14 @@ index 9bf51673..0db09df6 100644
 +                *row = impl->m_selection_resolved.start_row();
 +    }
 +}
++catch (...)
++{
++	vte::log_exception();
++}
 +
  /**
   * vte_terminal_get_cursor_position:
   * @terminal: a #VteTerminal
+-- 
+2.25.2
+
